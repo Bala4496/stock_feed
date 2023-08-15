@@ -2,12 +2,11 @@ package ua.bala.stocks_feed.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.buffer.ByteBuf;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -15,14 +14,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.stream.StreamSupport;
 
-@Service
+import static ua.bala.stocks_feed.configuration.CacheConfig.*;
+
 @Slf4j
+@Service
 public class JQuantsAdapter implements ExchangeAdapter {
 
     @Value("${jquants.mail_address}")
@@ -35,15 +37,16 @@ public class JQuantsAdapter implements ExchangeAdapter {
     private final static String COMPANIES_INFO_API = "/listed/info";
     private final static String STOCK_PRICES_API = "/prices/daily_quotes";
     private final WebClient webClient;
-    @Autowired
-    @Lazy
-    private JQuantsAdapter jQuantsAdapter;
+    private final JQuantsAdapter jQuantsAdapter;
 
-    public JQuantsAdapter(WebClient.Builder webClientBuilder) {
+    public JQuantsAdapter(WebClient.Builder webClientBuilder,
+                          @Lazy JQuantsAdapter jQuantsAdapter
+    ) {
         this.webClient = webClientBuilder.baseUrl(HOST_URL).build();
+        this.jQuantsAdapter = jQuantsAdapter;
     }
 
-    @Cacheable("refreshTokenCache")
+    @Cacheable(REFRESH_TOKEN_CACHE_KEY)
     @Override
     public Mono<String> getRefreshToken() {
         log.info("Fetching RefreshToken");
@@ -54,12 +57,14 @@ public class JQuantsAdapter implements ExchangeAdapter {
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .map(node -> node.get("refreshToken").asText())
-                .doOnNext(a -> log.info("Fetched RefreshToken"))
+                .publishOn(Schedulers.boundedElastic())
+                .doFinally(signalType -> log.info("Fetched RefreshToken"))
                 .doOnError(a -> log.info("Error by fetching RefreshToken"))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No RefreshToken received")));
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No RefreshToken received")))
+                .cache();
     }
 
-    @Cacheable("accessTokenCache")
+    @Cacheable(ACCESS_TOKEN_CACHE_KEY)
     @Override
     public Mono<String> getAccessToken() {
         log.info("Fetching AccessToken");
@@ -74,58 +79,61 @@ public class JQuantsAdapter implements ExchangeAdapter {
                         .retrieve()
                         .bodyToMono(JsonNode.class)
                         .map(node -> node.get("idToken").asText())
-                        .doOnNext(a -> log.info("Fetched AccessToken"))
+                        .publishOn(Schedulers.boundedElastic())
+                        .doFinally(signalType -> log.info("Fetched AccessToken"))
                         .doOnError(a -> log.info("Error by fetching AccessToken"))
                         .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No AccessToken received")))
-                );
+                )
+                .cache();
     }
 
-//    @Cacheable("companiesCache")
     @Override
-    public Flux<Company> getCompanies() {
-        return jQuantsAdapter.getAccessToken()
-                .flatMapMany(accessToken -> webClient.get()
-                        .uri(COMPANIES_INFO_API)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization", accessToken)
-                        .retrieve()
-                        .bodyToFlux(DataBuffer.class)
-                        .map(dataBuffer -> dataBuffer.toString(StandardCharsets.UTF_8))
-                        .collectList()
-                        .map(strings -> String.join("", strings))
-                        .flatMapMany(jsonString -> {
-                            try {
-                                return Flux.fromIterable(new ObjectMapper().readTree(String.valueOf(jsonString)).get("info"));
-                            } catch (Exception e) {
-                                return Flux.empty();
-                            }
-                        })
-                        .map(node -> new Company(node.get("Code").asText(), node.get("CompanyNameEnglish").asText()))
-                        .doFinally(signalType -> log.info("Companies uploaded"))
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No Companies received")))
-                );
+    public Flux<Company> getCompanies(String accessToken) {
+        return webClient.get()
+                .uri(COMPANIES_INFO_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", accessToken)
+                .retrieve()
+                .bodyToFlux(ByteBuf.class)
+                .flatMap(byteBuf -> {
+                    try {
+                        return Mono.just(byteBuf.toString(Charset.defaultCharset()));
+                    } finally {
+                        byteBuf.release();
+                    }
+                })
+                .collectList()
+                .map(strings -> String.join("", strings))
+                .flatMapMany(jsonString -> {
+                    try {
+                        return Flux.fromIterable(new ObjectMapper().readTree(String.valueOf(jsonString)).get("info"));
+                    } catch (Exception e) {
+                        return Flux.empty();
+                    }
+                })
+                .map(node -> new Company(node.get("Code").asText(), node.get("CompanyNameEnglish").asText()))
+                .doFinally(signalType -> log.info("Companies uploaded"))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No Companies received")));
     }
 
-//    @Cacheable("stockQuotesCache")
     @Override
-    public Mono<Quote> getStockQuotesByCode(Integer stockCode) {
-        return jQuantsAdapter.getAccessToken()
-                .flatMap(accessToken -> webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path(STOCK_PRICES_API)
-                                .queryParam("code", stockCode)
-                                .build()
-                        )
-                        .accept(MediaType.APPLICATION_JSON)
-                        .header("Authorization", accessToken)
-                        .retrieve()
-                        .bodyToMono(JsonNode.class)
-                        .flatMapMany(jsonNode -> Flux.fromStream(StreamSupport.stream(jsonNode.get("daily_quotes").spliterator(), true)))
-                        .map(node -> new Quote(node.get("Date").asText(), node.get("Code").asText(), node.get("Open").asDouble()))
-                        .sort((e1, e2) -> e2.date().compareTo(e1.date()))
-                        .next()
-                        .doOnError(throwable -> log.error("Error while getStockQuotesByCode", throwable))
-                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No Stock quotes received")))
-                );
+    public Mono<Quote> getStockQuotesByCode(String accessToken, Integer stockCode) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path(STOCK_PRICES_API)
+                        .queryParam("code", stockCode)
+                        .build()
+                )
+                .accept(MediaType.APPLICATION_JSON)
+                .header("Authorization", accessToken)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .flatMapMany(jsonNode -> Flux.fromStream(StreamSupport.stream(jsonNode.get("daily_quotes").spliterator(), true)))
+                .map(node -> new Quote(node.get("Date").asText(), node.get("Code").asText(), node.get("Open").asDouble()))
+                .sort((quote1, quote2) -> quote2.date().compareTo(quote1.date()))
+                .next()
+                .doFinally(signalType -> log.info("Quote uploaded"))
+                .doOnError(throwable -> log.error("Error while getStockQuotesByCode", throwable))
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No Stock quotes received")));
     }
 }

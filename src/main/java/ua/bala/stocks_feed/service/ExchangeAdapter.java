@@ -11,7 +11,7 @@ public interface ExchangeAdapter {
 
     Mono<String> getAccessToken();
 
-    Flux<Company> getCompanies();
+    Flux<Company> getCompanies(String accessToken);
 
-    Mono<Quote> getStockQuotesByCode(Integer stockCode);
+    Mono<Quote> getStockQuotesByCode(String accessToken, Integer stockCode);
 }

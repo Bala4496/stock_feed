@@ -1,6 +1,6 @@
 package ua.bala.stocks_feed.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import ua.bala.stocks_feed.service.RegisterService;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/register")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RegisterController {
 
     private final RegisterService registerService;
