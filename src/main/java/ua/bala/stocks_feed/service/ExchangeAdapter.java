@@ -5,7 +5,11 @@ import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
 
-public interface ExchangeConnector {
+public interface ExchangeAdapter {
+
+    Mono<String> getRefreshToken();
+
+    Mono<String> getAccessToken();
 
     Flux<Company> getCompanies();
 

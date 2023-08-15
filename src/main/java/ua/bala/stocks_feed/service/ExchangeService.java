@@ -8,18 +8,20 @@ import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
 
+@Slf4j
 @Service
 @AllArgsConstructor
-@Slf4j
 public class ExchangeService {
 
-    private final ExchangeConnector exchangeConnector;
+    private final ExchangeAdapter exchangeConnector;
 
     public Flux<Company> getCompanies() {
+        log.info("Getting Companies");
         return exchangeConnector.getCompanies();
     }
 
     public Mono<Quote> getStockByCode(Integer stockCode) {
+        log.info("Getting Stock quotes");
         return exchangeConnector.getStockQuotesByCode(stockCode);
     }
 

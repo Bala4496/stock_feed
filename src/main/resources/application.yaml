@@ -1,32 +1,22 @@
 spring:
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/stock_feed_db
-    username: root
-    password: root
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+  r2dbc:
+    url: r2dbc:pool:postgresql://${DB_URL:localhost:5432/stock_feed_db}
+    username: ${DB_USERNAME:root}
+    password: ${PASSWORD:root}
 
   flyway:
-    url: jdbc:postgresql://localhost:5432/stock_feed_db
-    user: root
-    password: root
-
-#redis:
-#  host: localhost
-#  port: 6379
+    user: ${DB_USERNAME:root}
+    url: jdbc:postgresql://${DB_URL:localhost:5432/stock_feed_db}
+    password: ${PASSWORD:root}
 
 jquants:
-  mail_address: igor.balabay01@gmail.com
-  password: Bala4496Bala4496
+  mail_address: ${MAIL_ADDRESS:igor.balabay01@gmail.com}
+  password: ${PASSWORD:Bala4496Bala4496}
 
 logging:
   level:
     org:
-      hibernate: INFO
+      springframework:
+        data:
+          r2dbc: DEBUG

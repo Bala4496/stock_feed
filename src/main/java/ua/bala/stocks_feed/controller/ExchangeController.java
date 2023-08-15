@@ -1,6 +1,6 @@
 package ua.bala.stocks_feed.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -9,14 +9,13 @@ import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
 import ua.bala.stocks_feed.service.ExchangeService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/exchange")
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class ExchangeController {
 
     private final ExchangeService exchangeService;
-
 
     @GetMapping("/companies")
     public Flux<Company> receiveCompanies() {

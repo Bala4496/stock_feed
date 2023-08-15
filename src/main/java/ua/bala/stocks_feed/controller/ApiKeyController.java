@@ -9,22 +9,21 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.dto.UserDto;
 import ua.bala.stocks_feed.mapper.UserMapper;
-import ua.bala.stocks_feed.model.User;
-import ua.bala.stocks_feed.service.AuthenticationService;
+import ua.bala.stocks_feed.service.ApiKeyService;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/api-key")
 @RequiredArgsConstructor
-@Slf4j
-public class AuthenticationController {
+public class ApiKeyController {
 
-    private final AuthenticationService authenticationService;
+    private final ApiKeyService apiKeyService;
+    private final UserMapper userMapper;
 
     @PostMapping
     public Mono<String> generateApiKey(@RequestBody UserDto userDto) {
-        log.info("Generating of ApiKey");
-        User user = UserMapper.INSTANCE.map(userDto);
-        return authenticationService.generateApiKey(user);
+        log.info("Getting of ApiKey");
+        return apiKeyService.getApiKey(userMapper.map(userDto));
     }
 
 }
