@@ -10,7 +10,7 @@ services:
       - postgres
       - redis
     environment:
-      DB_URL: localhost:5432/stock_feed_db
+      DB_URL: stock-feed-postgres:5432/stock_feed_db
       DB_USERNAME: root
       DB_PASSWORD: root
       MAIL_ADDRESS: igor.balabay01@gmail.com

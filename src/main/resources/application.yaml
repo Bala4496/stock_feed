@@ -3,15 +3,12 @@ spring:
   r2dbc:
     url: r2dbc:pool:postgresql://${DB_URL:localhost:5432/stock_feed_db}
     username: ${DB_USERNAME:root}
-    password: ${PASSWORD:root}
+    password: ${DB_PASSWORD:root}
 
   flyway:
-    user: ${DB_USERNAME:root}
     url: jdbc:postgresql://${DB_URL:localhost:5432/stock_feed_db}
-    password: ${PASSWORD:root}
-
-#  cache:
-#    type: redis
+    user: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
 
 jquants:
   mail_address: ${MAIL_ADDRESS:igor.balabay01@gmail.com}

@@ -1,3 +1,5 @@
+create database stock_feed_db;
+
 create table users
 (
     id         serial       primary key,
