@@ -21,16 +21,13 @@ import ua.bala.stocks_feed.model.Quote;
 import java.nio.charset.Charset;
 import java.util.stream.StreamSupport;
 
-import static ua.bala.stocks_feed.configuration.CacheConfig.*;
+import static ua.bala.stocks_feed.configuration.CacheConfig.ACCESS_TOKEN_CACHE_KEY;
+import static ua.bala.stocks_feed.configuration.CacheConfig.REFRESH_TOKEN_CACHE_KEY;
 
 @Slf4j
 @Service
 public class JQuantsAdapter implements ExchangeAdapter {
 
-    @Value("${jquants.mail_address}")
-    private String mailAddress;
-    @Value("${jquants.password}")
-    private String password;
     private final static String HOST_URL = "https://api.jquants.com/v1";
     private final static String REFRESH_TOKEN_API = "/token/auth_user";
     private final static String ACCESS_TOKEN_API = "/token/auth_refresh";
@@ -38,6 +35,10 @@ public class JQuantsAdapter implements ExchangeAdapter {
     private final static String STOCK_PRICES_API = "/prices/daily_quotes";
     private final WebClient webClient;
     private final JQuantsAdapter jQuantsAdapter;
+    @Value("${jquants.mail_address}")
+    private String mailAddress;
+    @Value("${jquants.password}")
+    private String password;
 
     public JQuantsAdapter(WebClient.Builder webClientBuilder,
                           @Lazy JQuantsAdapter jQuantsAdapter

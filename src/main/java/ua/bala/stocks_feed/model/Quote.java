@@ -1,4 +1,4 @@
 package ua.bala.stocks_feed.model;
 
-public record Quote (String date, String code, double cost) {
+public record Quote(String date, String code, double cost) {
 }
