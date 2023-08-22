@@ -1,6 +1,5 @@
 package ua.bala.stocks_feed.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
@@ -23,7 +22,6 @@ public class User implements UserDetails {
     @Id
     private Long id;
     private String username;
-    @JsonIgnore
     private String password;
     private UserRole role;
     private boolean enabled;

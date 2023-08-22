@@ -1,16 +1,15 @@
 package ua.bala.stocks_feed.service;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+import ua.bala.stocks_feed.model.User;
 import ua.bala.stocks_feed.repository.UserRepository;
 
-@Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements ReactiveUserDetailsService {
 
     private final UserRepository userRepository;
@@ -18,8 +17,10 @@ public class UserService implements ReactiveUserDetailsService {
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .cast(UserDetails.class)
-                .doOnSuccess(usr -> log.info("User '%s' found".formatted(usr.getUsername())))
-                .doOnError(err -> log.info("User not found", err));
+                .cast(UserDetails.class);
+    }
+
+    public Mono<User> getEnabledById(Long id) {
+        return userRepository.findByIdAndEnabledTrue(id);
     }
 }

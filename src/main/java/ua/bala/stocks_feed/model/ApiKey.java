@@ -5,17 +5,14 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDateTime;
-
-@Table(name = "user_keys")
+@Table(name = "api_keys")
 @Data
 @Accessors(chain = true)
-public class UserKey {
+public class ApiKey {
 
     @Id
     private Long id;
     private String key;
     private Long userId;
-    private LocalDateTime expiredAt;
-
+    private boolean deleted;
 }

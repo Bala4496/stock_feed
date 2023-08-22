@@ -13,8 +13,6 @@ services:
       DB_URL: stock-feed-postgres:5432/stock_feed_db
       DB_USERNAME: root
       DB_PASSWORD: root
-      MAIL_ADDRESS: igor.balabay01@gmail.com
-      PASSWORD: Bala4496Bala4496
     ports:
       - "8080:8080"
 
@@ -36,8 +34,8 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/data
+      - redis_data:/data
 
 volumes:
-  redis-data:
+  redis_data:
   postgres_data:

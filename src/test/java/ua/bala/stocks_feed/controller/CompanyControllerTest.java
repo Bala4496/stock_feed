@@ -1,10 +1,10 @@
-package ua.bala.stocks_feed.service;
+package ua.bala.stocks_feed.controller;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ExchangeServiceTest {
+class CompanyControllerTest {
 
     @BeforeEach
     void setUp() {
@@ -15,7 +15,7 @@ class ExchangeServiceTest {
     }
 
     @Test
-    void getCompanies() {
+    void receiveCompanies() {
     }
 
     @Test

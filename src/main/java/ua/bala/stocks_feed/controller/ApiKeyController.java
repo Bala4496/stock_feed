@@ -1,29 +1,37 @@
 package ua.bala.stocks_feed.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
-import ua.bala.stocks_feed.dto.UserDto;
-import ua.bala.stocks_feed.mapper.UserMapper;
+import ua.bala.stocks_feed.dto.ApiKeyDTO;
+import ua.bala.stocks_feed.mapper.ApiKeyMapper;
 import ua.bala.stocks_feed.service.ApiKeyService;
 
-@Slf4j
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/v1/api-key")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ApiKeyController {
 
     private final ApiKeyService apiKeyService;
-    private final UserMapper userMapper;
+    private final ApiKeyMapper apiKeyMapper;
 
     @PostMapping
-    public Mono<String> generateApiKey(@RequestBody UserDto userDto) {
-        log.info("Getting of ApiKey");
-        return apiKeyService.getApiKey(userMapper.map(userDto));
+    public Mono<ApiKeyDTO> createApiKey() {
+        return apiKeyService.createApiKey("admin4")
+                .map(apiKeyMapper::map);
+    }
+
+    @GetMapping
+    public Mono<ApiKeyDTO> getApiKey(Principal principal) {
+        return apiKeyService.getApiKeyByUsername(principal.getName())
+                .map(apiKeyMapper::map);
+    }
+
+    @DeleteMapping("/{apiKey}")
+    public Mono<Void> disableApiKey(@PathVariable String apiKey) {
+        return apiKeyService.deleteApiKey(apiKey);
     }
 
 }

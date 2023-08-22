@@ -1,4 +1,18 @@
 package ua.bala.stocks_feed.model;
 
-public record Company(String code, String name) {
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+
+//@RedisHash(COMPANY_KEY)
+@Table("companies")
+@Data
+@Accessors(chain = true)
+public class Company {
+
+    @Id
+    private Long id;
+    private String code;
+    private String name;
 }

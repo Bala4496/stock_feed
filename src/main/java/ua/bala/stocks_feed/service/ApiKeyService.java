@@ -1,67 +1,61 @@
 package ua.bala.stocks_feed.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import ua.bala.stocks_feed.exception.InvalidApiKeyException;
+import reactor.core.scheduler.Schedulers;
+import ua.bala.stocks_feed.model.ApiKey;
 import ua.bala.stocks_feed.model.User;
-import ua.bala.stocks_feed.model.UserKey;
-import ua.bala.stocks_feed.repository.UserKeyRepository;
+import ua.bala.stocks_feed.repository.ApiKeyRepository;
 import ua.bala.stocks_feed.repository.UserRepository;
 
-import java.time.LocalDateTime;
+import java.util.Objects;
 
-@Slf4j
 @Service
-@AllArgsConstructor
+@Slf4j
+@RequiredArgsConstructor
 public class ApiKeyService {
 
     private final UserRepository userRepository;
-    private final UserKeyRepository userKeyRepository;
+    private final ApiKeyRepository apiKeyRepository;
 
-    public Mono<String> getApiKey(User usr) {
-        String username = usr.getUsername();
-        log.info("Generating ApiKey for %s".formatted(username));
+    public Mono<ApiKey> createApiKey(String username) {
         return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("User with username '%s' not exist".formatted(username))))
-                .flatMap(user -> userKeyRepository.findUserKeyByUserId(user.getId())
-                        .filter(userKey -> userKey.getExpiredAt().isAfter(LocalDateTime.now()))
-                        .next()
-                        .map(UserKey::getKey)
-                        .switchIfEmpty(generateAndSaveApiKey(user).map(UserKey::getKey))
-                )
-                .doOnSuccess(key -> log.info("Generated ApiKey for '%s'".formatted(username)))
-                .doOnError(throwable -> log.error("ApiKey wasn't generated  for '%s'".formatted(username), throwable));
+                .map(User::getId)
+                .publishOn(Schedulers.boundedElastic())
+                .doOnNext(userId -> apiKeyRepository.findByUserIdAndDeletedFalse(userId)
+                        .doOnNext(s -> s.setDeleted(true))
+                        .flatMap(apiKeyRepository::delete)
+                        .subscribe())
+                .map(userId -> new ApiKey().setUserId(userId).setKey(generateApiKey()))
+                .flatMap(apiKeyRepository::save);
     }
 
-    private Mono<UserKey> generateAndSaveApiKey(User user) {
-        return Mono.fromCallable(() -> RandomStringUtils.randomAlphabetic(20))
-                .doOnNext(key -> log.info("Generated ApiKey for %s".formatted(user.getUsername())))
-                .flatMap(key -> userKeyRepository.save(new UserKey()
-                        .setKey(key)
-                        .setUserId(user.getId())
-                        .setExpiredAt(LocalDateTime.now().plusHours(1))
-                ))
-                .doOnSuccess(key -> log.info("Generated ApiKey saved"))
-                .doOnError(err -> log.info("Generated ApiKey not saved", err));
+    public Mono<ApiKey> getApiKeyByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .map(User::getId)
+                .flatMap(apiKeyRepository::findByUserIdAndDeletedFalse);
+    }
+
+    public Mono<ApiKey> getApiKeyByKey(String key) {
+        return apiKeyRepository.findByKeyAndDeletedFalse(key);
+    }
+
+    public Mono<Void> deleteApiKey(String apiKey) {
+        return apiKeyRepository.findByKeyAndDeletedFalse(apiKey)
+                .doOnNext(key -> key.setDeleted(true))
+                .flatMap(apiKeyRepository::save)
+                .cast(Void.class);
+    }
+
+    public String generateApiKey() {
+        return RandomStringUtils.randomAlphabetic(20);
     }
 
     public Mono<Boolean> isValidApiKey(String apiKey) {
-        log.info("Starting apiKey '{}' validation", apiKey);
-        return getUserByApiKey(apiKey)
-                .doOnNext(user -> log.info(user.toString()))
-                .map(User::isEnabled)
-                .switchIfEmpty(Mono.error(new InvalidApiKeyException("User key expired")))
-                .doOnSuccess(key -> log.info("ApiKey is valid"));
+        return apiKeyRepository.findByKeyAndDeletedFalse(apiKey)
+                .map(Objects::nonNull);
     }
-
-    public Mono<User> getUserByApiKey(String apiKey) {
-        return userKeyRepository.findUserKeyByKey(apiKey)
-                .filter(userKey -> userKey.getExpiredAt().isAfter(LocalDateTime.now()))
-                .flatMap(userKey -> userRepository.findById(userKey.getUserId()));
-    }
-
 }

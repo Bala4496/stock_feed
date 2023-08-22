@@ -1,7 +1,6 @@
 package ua.bala.stocks_feed.service;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,9 +10,8 @@ import ua.bala.stocks_feed.repository.UserRepository;
 
 import java.util.Objects;
 
-@Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RegisterService {
 
     private final UserRepository userRepository;
@@ -25,9 +23,6 @@ public class RegisterService {
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
-        return userRepository.save(user)
-                .doOnSuccess(usr -> log.info("User '%s' registered".formatted(usr.getUsername())))
-                .doOnError(err -> log.info("User not registered", err));
+        return userRepository.save(user);
     }
-
 }

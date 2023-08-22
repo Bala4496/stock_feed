@@ -1,5 +1,8 @@
 spring:
 
+  application:
+    name: stocksfeed
+
   r2dbc:
     url: r2dbc:pool:postgresql://${DB_URL:localhost:5432/stock_feed_db}
     username: ${DB_USERNAME:root}
@@ -10,9 +13,20 @@ spring:
     user: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
 
-jquants:
-  mail_address: ${MAIL_ADDRESS:igor.balabay01@gmail.com}
-  password: ${PASSWORD:Bala4496Bala4496}
+rate-limiter:
+  rate: 10
+  timeline: 10
+
+quote-generation:
+  enabled: ${GEN_ENABLE:true}
+  delay: ${GEN_DELAY:15000} # 15 * 1000ms
+
+redis-cache:
+  enabled: ${CACHEABLE:false}
+
+company:
+  init-path: classpath:companies.csv
+
 
 logging:
   level:

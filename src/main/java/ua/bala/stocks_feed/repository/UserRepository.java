@@ -7,4 +7,5 @@ import ua.bala.stocks_feed.model.User;
 public interface UserRepository extends ReactiveCrudRepository<User, Long> {
 
     Mono<User> findByUsername(String username);
+    Mono<User> findByIdAndEnabledTrue(Long id);
 }
