@@ -27,7 +27,7 @@ public class ApiKeyService {
                 .publishOn(Schedulers.boundedElastic())
                 .doOnNext(userId -> apiKeyRepository.findByUserIdAndDeletedFalse(userId)
                         .doOnNext(s -> s.setDeleted(true))
-                        .flatMap(apiKeyRepository::delete)
+                        .flatMap(apiKeyRepository::save)
                         .subscribe())
                 .map(userId -> new ApiKey().setUserId(userId).setKey(generateApiKey()))
                 .flatMap(apiKeyRepository::save);
