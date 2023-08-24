@@ -14,15 +14,16 @@ spring:
     password: ${DB_PASSWORD:root}
 
 rate-limiter:
-  rate: 10
-  timeline: 10
+  rate: 3
+  timeline: 5000 # 5 * 1000ms
+  timeout: 100
 
 quote-generation:
   enabled: ${GEN_ENABLE:false}
   delay: ${GEN_DELAY:60000} # 60 * 1000ms = 1 min
 
 redis-cache:
-  enabled: ${CACHEABLE:false}
+  enabled: ${CACHEABLE:true}
 
 company:
   init-path: classpath:companies.csv
@@ -32,5 +33,6 @@ logging:
   level:
     org:
       springframework:
+        security: DEBUG
         data:
           r2dbc: DEBUG
