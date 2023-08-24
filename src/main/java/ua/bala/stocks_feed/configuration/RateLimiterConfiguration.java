@@ -15,12 +15,15 @@ public class RateLimiterConfiguration {
     private int limitForPeriod;
     @Value("${rate-limiter.timeline}")
     private long limitRefreshPeriod;
+    @Value("${rate-limiter.timeout}")
+    private long timeoutDuration;
 
     @Bean
     public RateLimiter rateLimiter() {
         RateLimiterConfig defaultConfig = RateLimiterConfig.custom()
                 .limitForPeriod(limitForPeriod)
                 .limitRefreshPeriod(Duration.ofSeconds(limitRefreshPeriod))
+                .timeoutDuration(Duration.ofMillis(timeoutDuration))
                 .build();
         return RateLimiter.of("defaultRateLimiter", defaultConfig);
     }
