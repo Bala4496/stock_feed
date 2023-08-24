@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class QuoteDTO {
 
     private Long id;
-    private String companyId;
+    private String companyCode;
     private BigDecimal price;
     private LocalDateTime createdAt;
 }

@@ -10,7 +10,6 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-//@RedisHash(QUOTE_KEY)
 @Table("quotes")
 @Data
 @Accessors(chain = true)
@@ -18,8 +17,8 @@ public class Quote {
 
     @Id
     private Long id;
-    @Column("company_id")
-    private Long companyId;
+    @Column("company_code")
+    private String companyCode;
     private BigDecimal price;
     @CreatedDate
     @Column("created_at")

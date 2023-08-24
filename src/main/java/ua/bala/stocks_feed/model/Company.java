@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-//@RedisHash(COMPANY_KEY)
 @Table("companies")
 @Data
 @Accessors(chain = true)

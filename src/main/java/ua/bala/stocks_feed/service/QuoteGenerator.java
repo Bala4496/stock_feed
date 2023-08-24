@@ -39,7 +39,7 @@ public class QuoteGenerator {
         var error = new BigDecimal("0.5");
         var newCost = new Random().nextBoolean() ? oldCost.add(error) : oldCost.subtract(error);
         newCost = newCost.setScale(2, RoundingMode.HALF_UP);
-        return new Quote().setCompanyId(quote.getCompanyId()).setPrice(newCost);
+        return new Quote().setCompanyCode(quote.getCompanyCode()).setPrice(newCost);
     }
 
 }

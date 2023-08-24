@@ -1,38 +1,31 @@
 package ua.bala.stocks_feed.repository;
 
-import org.springframework.data.redis.core.ReactiveHashOperations;
-import org.springframework.data.redis.core.ReactiveRedisOperations;
+import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.Quote;
 
-import static ua.bala.stocks_feed.configuration.RedisConfiguration.QUOTE_KEY;
+import java.util.function.UnaryOperator;
+
+import static ua.bala.stocks_feed.configuration.RedisConfiguration.QUOTE_KEY_PREFIX;
 
 @Repository
 public class QuoteRepositoryRedis {
 
-    private final ReactiveHashOperations<String, Long, Quote> quoteReactiveRedisOperations;
+    private final ReactiveRedisTemplate<String, Quote> quoteReactiveRedisTemplate;
+    private final UnaryOperator<String> prefixApplier = (String key) -> String.join("#", QUOTE_KEY_PREFIX, key);
 
-    public QuoteRepositoryRedis(ReactiveRedisOperations<String, Quote> quoteReactiveRedisOperations) {
-        this.quoteReactiveRedisOperations = quoteReactiveRedisOperations.opsForHash();
+    public QuoteRepositoryRedis(ReactiveRedisTemplate<String, Quote> quoteReactiveRedisTemplate) {
+        this.quoteReactiveRedisTemplate = quoteReactiveRedisTemplate;
     }
 
-    public Mono<Quote> findByCompanyId(Long companyId) {
-        return quoteReactiveRedisOperations.get(QUOTE_KEY, companyId);
-    }
-
-    public Flux<Quote> findAll() {
-        return quoteReactiveRedisOperations.values(QUOTE_KEY);
+    public Mono<Quote> findByCompanyCode(String companyCode) {
+        return quoteReactiveRedisTemplate.opsForValue().get(companyCode);
     }
 
     public Mono<Quote> save(Quote quote) {
-        return quoteReactiveRedisOperations.put(QUOTE_KEY, quote.getCompanyId(), quote)
+        return quoteReactiveRedisTemplate.opsForValue().set(prefixApplier.apply(quote.getCompanyCode()), quote)
                 .thenReturn(quote);
-    }
-
-    public Mono<Boolean> deleteByCompanyId(Long companyId) {
-        return quoteReactiveRedisOperations.remove(QUOTE_KEY, companyId).hasElement();
     }
 }
 

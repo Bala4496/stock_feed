@@ -6,5 +6,5 @@ import ua.bala.stocks_feed.model.Quote;
 
 public interface QuoteRepository extends ReactiveCrudRepository<Quote, Long> {
 
-    Mono<Quote> findFirstByCompanyIdOrderByCreatedAtDesc(Long companyId);
+    Mono<Quote> findFirstByCompanyCodeOrderByCreatedAtDesc(String companyCode);
 }
