@@ -39,7 +39,7 @@ public class ApiKeyService {
                 .flatMap(apiKeyRepository::findByUserIdAndDeletedFalse);
     }
 
-    public Mono<ApiKey> getApiKeyByKey(String key) {
+    public Mono<ApiKey> getByKey(String key) {
         return apiKeyRepository.findByKeyAndDeletedFalse(key);
     }
 

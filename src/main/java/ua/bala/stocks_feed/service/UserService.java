@@ -20,7 +20,7 @@ public class UserService implements ReactiveUserDetailsService {
                 .cast(UserDetails.class);
     }
 
-    public Mono<User> getEnabledById(Long id) {
+    public Mono<User> getById(Long id) {
         return userRepository.findByIdAndEnabledTrue(id);
     }
 }
