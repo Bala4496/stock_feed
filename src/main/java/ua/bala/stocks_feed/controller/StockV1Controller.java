@@ -13,7 +13,7 @@ import ua.bala.stocks_feed.service.QuoteService;
 @RestController
 @RequestMapping("/api/v1/stocks")
 @RequiredArgsConstructor
-public class QuoteController {
+public class StockV1Controller {
 
     private final QuoteService quoteService;
     private final QuoteMapper quoteMapper;

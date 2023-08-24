@@ -8,10 +8,12 @@ import ua.bala.stocks_feed.dto.UserDTO;
 import ua.bala.stocks_feed.mapper.ApiKeyMapper;
 import ua.bala.stocks_feed.service.ApiKeyService;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/v1/api-key")
 @RequiredArgsConstructor
-public class ApiKeyController {
+public class ApiKeyV1Controller {
 
     private final ApiKeyService apiKeyService;
     private final ApiKeyMapper apiKeyMapper;

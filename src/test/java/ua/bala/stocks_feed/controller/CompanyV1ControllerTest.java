@@ -4,7 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ApiKeyControllerTest {
+class CompanyV1ControllerTest {
 
     @BeforeEach
     void setUp() {
@@ -15,6 +15,10 @@ class ApiKeyControllerTest {
     }
 
     @Test
-    void generateApiKey() {
+    void receiveCompanies() {
+    }
+
+    @Test
+    void getStockByCode() {
     }
 }

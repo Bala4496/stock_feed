@@ -15,7 +15,7 @@ import ua.bala.stocks_feed.service.RegisterService;
 @RestController
 @RequestMapping("/api/v1/register")
 @RequiredArgsConstructor
-public class RegisterController {
+public class RegisterV1Controller {
 
     private final RegisterService registerService;
     private final UserMapper userMapper;

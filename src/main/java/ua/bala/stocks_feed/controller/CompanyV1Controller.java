@@ -12,7 +12,7 @@ import ua.bala.stocks_feed.service.CompanyService;
 @RestController
 @RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
-public class CompanyController {
+public class CompanyV1Controller {
 
     private final CompanyService companyService;
     private final CompanyMapper companyMapper;
