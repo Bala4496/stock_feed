@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class QuoteDTO {
 
-    private Long id;
     private String companyCode;
     private BigDecimal price;
     private LocalDateTime createdAt;

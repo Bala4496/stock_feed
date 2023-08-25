@@ -45,6 +45,6 @@ public class ApiKeyAuthorizationManager implements ReactiveAuthorizationManager<
                 .flatMap(apiKeyService::getByKey)
                 .flatMap(key -> userService.getById(key.getUserId()))
                 .map(user -> new AuthorizationDecision(true))
-                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is not enabled")));
+                .switchIfEmpty(Mono.just(new AuthorizationDecision(false)));
     }
 }

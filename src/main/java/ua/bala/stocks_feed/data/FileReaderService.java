@@ -1,4 +1,4 @@
-package ua.bala.stocks_feed.service;
+package ua.bala.stocks_feed.data;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

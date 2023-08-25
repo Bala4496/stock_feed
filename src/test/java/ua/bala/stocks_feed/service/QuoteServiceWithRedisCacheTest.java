@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.Quote;
 import ua.bala.stocks_feed.repository.QuoteRepository;
+import ua.bala.stocks_feed.repository.QuoteRepositoryRedis;
 
 import java.math.BigDecimal;
 
@@ -20,10 +21,12 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
-class QuoteServiceTest {
+class QuoteServiceWithRedisCacheTest {
 
     @MockBean
     QuoteRepository quoteRepository;
+    @MockBean
+    QuoteRepositoryRedis quoteRepositoryRedis;
     @Autowired
     QuoteService quoteService;
 
@@ -32,7 +35,8 @@ class QuoteServiceTest {
         Quote quote = getTestQuote();
         String companyCode = quote.getCompanyCode();
 
-        when(quoteRepository.findFirstByCompanyCodeOrderByCreatedAtDesc(companyCode)).thenReturn(Mono.just(quote));
+        when(quoteRepository.findFirstByCompanyCodeOrderByCreatedAtDesc(companyCode)).thenReturn(Mono.empty());
+        when(quoteRepositoryRedis.findByCompanyCode(companyCode)).thenReturn(Mono.just(quote));
 
         Quote block = quoteService.getQuoteByCode(companyCode).block();
 
@@ -44,19 +48,11 @@ class QuoteServiceTest {
         Quote quote = getTestQuote();
 
         when(quoteRepository.save(quote)).thenReturn(Mono.just(quote));
+        when(quoteRepositoryRedis.save(quote)).thenReturn(Mono.just(quote));
 
         Quote blockedQuote = quoteService.save(quote).block();
 
         assertEquals(quote, blockedQuote);
-    }
-
-    @Test
-    void getCount() {
-        when(quoteRepository.count()).thenReturn(Mono.just(1L));
-
-        Long count = quoteService.getCount().block();
-
-        assertEquals(1L, count);
     }
 
     private Quote getTestQuote() {

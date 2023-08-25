@@ -1,13 +1,13 @@
-package ua.bala.stocks_feed.configuration;
+package ua.bala.stocks_feed.data;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
 import ua.bala.stocks_feed.service.CompanyService;
-import ua.bala.stocks_feed.service.FileReaderService;
 import ua.bala.stocks_feed.service.QuoteService;
 
 import java.math.BigDecimal;
@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "company.load", havingValue = "true")
 public class CompanyLoader {
 
     private final FileReaderService fileReaderService;

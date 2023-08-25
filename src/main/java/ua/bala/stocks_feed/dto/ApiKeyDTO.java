@@ -7,9 +7,5 @@ import lombok.Data;
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class ApiKeyDTO {
-
-    private Long id;
     private String key;
-    private Long userId;
-    private boolean deleted;
 }

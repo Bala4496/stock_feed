@@ -1,0 +1,15 @@
+quote-generation:
+  enabled: false
+  delay: ${GEN_DELAY:60000} # 60 * 1000ms = 1 min
+
+company:
+  load: false
+  init-path: classpath:companies.csv
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+        data:
+          r2dbc: DEBUG

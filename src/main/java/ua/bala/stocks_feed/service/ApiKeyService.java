@@ -45,8 +45,8 @@ public class ApiKeyService {
         });
     }
 
-    private Mono<ApiKey> createApiKeyInternal(String username) {
-        return userRepository.findByUsername(username)
+    public Mono<ApiKey> createApiKeyInternal(String username) {
+        return userRepository.findByUsernameAndEnabledTrue(username)
                 .flatMap(user -> {
                     Mono<Void> deleteAndSave = apiKeyRepository.findByUserIdAndDeletedFalse(user.getId())
                             .flatMap(apiKey -> {
@@ -66,7 +66,7 @@ public class ApiKeyService {
     }
 
     public Mono<ApiKey> getApiKeyByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndEnabledTrue(username)
                 .map(User::getId)
                 .flatMap(apiKeyRepository::findByUserIdAndDeletedFalse);
     }
@@ -79,7 +79,7 @@ public class ApiKeyService {
         return apiKeyRepository.findByKeyAndDeletedFalse(apiKey)
                 .doOnNext(key -> key.setDeleted(true))
                 .flatMap(apiKeyRepository::save)
-                .cast(Void.class);
+                .flatMap(key -> Mono.empty());
     }
 
     public String generateApiKey() {

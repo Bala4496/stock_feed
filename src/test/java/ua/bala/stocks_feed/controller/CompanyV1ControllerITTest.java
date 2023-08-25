@@ -14,18 +14,22 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.configuration.WebFluxSecurityConfig;
-import ua.bala.stocks_feed.dto.RegisterUserDTO;
+import ua.bala.stocks_feed.model.ApiKey;
+import ua.bala.stocks_feed.model.User;
+import ua.bala.stocks_feed.model.UserRole;
+import ua.bala.stocks_feed.repository.ApiKeyRepository;
 import ua.bala.stocks_feed.repository.UserRepository;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 @Testcontainers
 @Import(WebFluxSecurityConfig.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class RegisterV1ControllerTest {
+class CompanyV1ControllerITTest {
 
     @LocalServerPort
     private Integer port;
@@ -41,9 +45,12 @@ class RegisterV1ControllerTest {
     }
 
     @Autowired
+    ApiKeyRepository apiKeyRepository;
+
+    @Autowired
     UserRepository userRepository;
 
-    static final String API_URL = "/api/v1/register";
+    static final String API_URL = "/api/v1/companies";
 
     @BeforeEach
     void setUp() {
@@ -52,46 +59,51 @@ class RegisterV1ControllerTest {
 
     @AfterEach
     void teatDown() {
+        apiKeyRepository.deleteAll().block();
         userRepository.deleteAll().block();
     }
 
     @Test
-    void registerUser() {
+    void receiveCompanies() {
+        addKeyForUser(addTestUser());
+
         given()
+                .header("x-api-key", "key")
                 .contentType(ContentType.JSON)
-                .body(getTestUser())
                 .when()
-                .post(API_URL)
+                .get(API_URL)
                 .then()
                 .statusCode(200)
-                .body("username", notNullValue())
-                .body("password", nullValue())
-                .body("role", notNullValue());
+                .body("$", hasSize(1000))
+                .body("code", notNullValue())
+                .body("name", notNullValue());
     }
 
     @Test
-    void registerUser_withInvalidUsername_Negative() {
+    void reachEndpoint_withInvalidApiKey_Negative() {
+        addKeyForUser(addTestUser());
+
         given()
+                .header("x-api-key", "invalidKey")
                 .contentType(ContentType.JSON)
-                .body(getTestUser().setUsername(null))
                 .when()
-                .post(API_URL)
+                .get(API_URL)
                 .then()
-                .statusCode(500);
+                .statusCode(401);
     }
 
-    @Test
-    void registerUser_withInvalidPassword_Negative() {
-        given()
-                .contentType(ContentType.JSON)
-                .body(getTestUser().setPassword(null))
-                .when()
-                .post(API_URL)
-                .then()
-                .statusCode(500);
+    private void addKeyForUser(User user) {
+        userRepository.findByUsernameAndEnabledTrue(user.getUsername())
+                .map(User::getId)
+                .map(userId -> new ApiKey().setUserId(userId).setKey("key"))
+                .flatMap(apiKeyRepository::save)
+                .block();
     }
 
-    private static RegisterUserDTO getTestUser() {
-        return new RegisterUserDTO().setUsername("test").setPassword("test");
+    private User addTestUser() {
+        User user = new User().setUsername("test").setPassword("{noop}test").setRole(UserRole.ROLE_USER).setEnabled(true);
+        return Mono.just(user)
+                .flatMap(userRepository::save)
+                .block();
     }
 }

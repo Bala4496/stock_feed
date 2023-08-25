@@ -8,7 +8,6 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class CompanyDTO {
 
-    private Long id;
     private String code;
     private String name;
 }

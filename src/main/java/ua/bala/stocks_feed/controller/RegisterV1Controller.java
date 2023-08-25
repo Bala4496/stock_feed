@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-import ua.bala.stocks_feed.dto.UserDTO;
-import ua.bala.stocks_feed.mapper.UserMapper;
+import ua.bala.stocks_feed.dto.RegisterUserDTO;
+import ua.bala.stocks_feed.mapper.RegisterUserMapper;
 import ua.bala.stocks_feed.service.RegisterService;
 
 @Slf4j
@@ -18,12 +18,11 @@ import ua.bala.stocks_feed.service.RegisterService;
 public class RegisterV1Controller {
 
     private final RegisterService registerService;
-    private final UserMapper userMapper;
+    private final RegisterUserMapper registerUserMapper;
 
     @PostMapping
-    public Mono<UserDTO> registerUser(@RequestBody UserDTO userDto) {
-        log.info("Registration of user");
-        return registerService.registerUser(userMapper.map(userDto))
-                .map(userMapper::map);
+    public Mono<RegisterUserDTO> registerUser(@RequestBody RegisterUserDTO registerUserDTO) {
+        return registerService.registerUser(registerUserMapper.map(registerUserDTO))
+                .map(registerUserMapper::map);
     }
 }

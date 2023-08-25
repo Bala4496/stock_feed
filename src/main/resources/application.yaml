@@ -19,13 +19,14 @@ rate-limiter:
   timeout: 100
 
 quote-generation:
-  enabled: ${GEN_ENABLE:false}
+  enabled: ${GEN_ENABLE:true}
   delay: ${GEN_DELAY:60000} # 60 * 1000ms = 1 min
 
 redis-cache:
   enabled: ${CACHEABLE:true}
 
 company:
+  load: true
   init-path: classpath:companies.csv
 
 

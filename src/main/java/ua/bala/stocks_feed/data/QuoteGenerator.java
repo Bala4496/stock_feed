@@ -1,4 +1,4 @@
-package ua.bala.stocks_feed.service;
+package ua.bala.stocks_feed.data;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ua.bala.stocks_feed.model.Company;
 import ua.bala.stocks_feed.model.Quote;
+import ua.bala.stocks_feed.service.CompanyService;
+import ua.bala.stocks_feed.service.QuoteService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

@@ -18,9 +18,9 @@ public class UserRateLimiterManager {
     private final RateLimiter defaultRateLimiter;
 
     public Mono<Boolean> acquirePermission(String apiKey) {
-        log.info("Acquire permission for {}", apiKey);
-        RateLimiter userRateLimiter = userRateLimiters.computeIfAbsent(apiKey, this::createRateLimiter);
-        return Mono.fromCallable(userRateLimiter::acquirePermission);
+        log.info("Acquire permission for key : '{}'", apiKey);
+        RateLimiter rateLimiter = userRateLimiters.computeIfAbsent(apiKey, this::createRateLimiter);
+        return Mono.fromCallable(rateLimiter::acquirePermission);
     }
 
     private RateLimiter createRateLimiter(String apiKey) {

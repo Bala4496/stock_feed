@@ -16,7 +16,7 @@ public class UserService implements ReactiveUserDetailsService {
 
     @Override
     public Mono<UserDetails> findByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndEnabledTrue(username)
                 .cast(UserDetails.class);
     }
 

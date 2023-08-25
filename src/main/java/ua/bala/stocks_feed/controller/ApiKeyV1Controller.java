@@ -19,7 +19,7 @@ public class ApiKeyV1Controller {
 
     @PostMapping
     public Mono<ApiKeyDTO> createApiKey(Principal principal) {
-        return apiKeyService.createApiKey(principal.getName())
+        return apiKeyService.createApiKeyInternal(principal.getName())
                 .map(apiKeyMapper::map);
     }
 
