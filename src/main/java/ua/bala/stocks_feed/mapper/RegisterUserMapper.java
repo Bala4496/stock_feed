@@ -15,6 +15,7 @@ public interface RegisterUserMapper {
     @InheritInverseConfiguration
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "enabled", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     User map(RegisterUserDTO registerUserDTO);
