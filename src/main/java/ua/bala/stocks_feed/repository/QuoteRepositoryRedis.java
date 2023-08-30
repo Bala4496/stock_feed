@@ -7,7 +7,7 @@ import ua.bala.stocks_feed.model.Quote;
 
 import java.util.function.UnaryOperator;
 
-import static ua.bala.stocks_feed.configuration.RedisConfiguration.QUOTE_KEY_PREFIX;
+import static ua.bala.stocks_feed.configuration.RedisConfig.QUOTE_KEY_PREFIX;
 
 @Repository
 public class QuoteRepositoryRedis {

@@ -9,7 +9,7 @@ import ua.bala.stocks_feed.model.Company;
 
 import java.util.function.UnaryOperator;
 
-import static ua.bala.stocks_feed.configuration.RedisConfiguration.COMPANY_KEY_PREFIX;
+import static ua.bala.stocks_feed.configuration.RedisConfig.COMPANY_KEY_PREFIX;
 
 @Slf4j
 @Repository

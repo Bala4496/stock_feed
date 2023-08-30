@@ -11,6 +11,7 @@ services:
       - redis
     environment:
       DB_URL: stock-feed-postgres:5432/stock_feed_db
+      REDIS_HOST: stock-feed-redis
       DB_USERNAME: root
       DB_PASSWORD: root
       GEN_ENABLE: true
