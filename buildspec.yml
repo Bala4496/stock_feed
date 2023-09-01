@@ -16,29 +16,6 @@ phases:
       - aws --version
       - git --version
 
-#
-#  pre_build:
-#    commands:
-#      - echo Build started on `date`
-#  build:
-#    commands:
-#      - ./mvnw clean install
-#  post_build:
-#    commands:
-#      - echo Build completed on `date`
-
-
-#  pre_test:
-#    commands:
-#      - echo Testing started on `date`
-#  test:
-#    commands:
-#      - ./mvnw test
-#  post_test:
-#    commands:
-#      - echo Testing completed on `date`
-
-
   pre_build:
     commands:
       - echo "Login to AWS ECR and get commit id"
