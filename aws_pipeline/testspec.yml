@@ -15,6 +15,3 @@ phases:
     commands:
       - echo "Compile and run tests"
       - mvn clean test
-
-artifacts:
-  files: '**/*'
