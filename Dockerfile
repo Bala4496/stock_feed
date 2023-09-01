@@ -1,5 +1,5 @@
 # Building the Spring Boot JAR
-FROM maven:3.8.4-openjdk-17 AS build
+FROM 554040323477.dkr.ecr.us-east-1.amazonaws.com/stock-feed-openjdk-17:latest AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
