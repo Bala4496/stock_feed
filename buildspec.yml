@@ -9,8 +9,6 @@ env:
 
 phases:
   install:
-    runtime-versions:
-      java: corretto17
     commands:
       - echo "Check aws and git version"
       - aws --version
