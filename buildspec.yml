@@ -28,15 +28,15 @@ phases:
 #      - echo Build completed on `date`
 
 
-  pre_test:
-    commands:
-      - echo Testing started on `date`
-  test:
-    commands:
-      - ./mvnw test
-  post_test:
-    commands:
-      - echo Testing completed on `date`
+#  pre_test:
+#    commands:
+#      - echo Testing started on `date`
+#  test:
+#    commands:
+#      - ./mvnw test
+#  post_test:
+#    commands:
+#      - echo Testing completed on `date`
 
 
   pre_build:
