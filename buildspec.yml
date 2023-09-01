@@ -16,16 +16,16 @@ phases:
       - aws --version
       - git --version
 
-
-  pre_build:
-    commands:
-      - echo Build started on `date`
-  build:
-    commands:
-      - ./mvnw clean install
-  post_build:
-    commands:
-      - echo Build completed on `date`
+#
+#  pre_build:
+#    commands:
+#      - echo Build started on `date`
+#  build:
+#    commands:
+#      - ./mvnw clean install
+#  post_build:
+#    commands:
+#      - echo Build completed on `date`
 
 
   pre_test:
@@ -39,20 +39,20 @@ phases:
       - echo Testing completed on `date`
 
 
-  pre_aws_build:
+  pre_build:
     commands:
       - echo "Login to AWS ECR and get commit id"
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - COMMIT_ID=$(git rev-parse --short HEAD)
 
-  aws_build:
+  build:
     commands:
       - echo Building the Docker image...
       - docker build -t $ECR_REPO_NAME:$ECR_IMAGE_TAG . || exit 1
 #      - docker tag $ECR_REPO_NAME:$ECR_IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
       - docker tag $ECR_REPO_NAME:$ECR_IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID
 
-  post_aws_build:
+  post_build:
     commands:
       - echo Pushing the Docker image...
 #      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
