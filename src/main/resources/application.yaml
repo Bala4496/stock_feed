@@ -20,11 +20,11 @@ rate-limiter:
 
 quote-generation:
   enabled: ${GEN_ENABLE:true}
-  delay: ${GEN_DELAY:60000} # 60 * 1000ms = 1 min
+  delay: ${GEN_DELAY:30000} # 30 * 1000ms = 1 min
 
 redis-cache:
-  host: ${REDIS_HOST:localhost}
   enabled: ${CACHEABLE:true}
+  host: ${REDIS_HOST:localhost}
 
 company:
   load: true
