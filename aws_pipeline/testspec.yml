@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: openjdk17
+
+  pre_build:
+    commands:
+      - echo "Install Maven"
+      - apt-get install -y maven
+      - mvn --version
+
+  build:
+    commands:
+      - echo "Compile and run tests"
+      - mvn clean test
+
+artifacts:
+  files: '**/*'
