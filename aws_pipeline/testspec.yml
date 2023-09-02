@@ -1,23 +1,28 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      java: corretto17
+#  install:
+#    runtime-versions:
+#      java: corretto17
+#    commands:
+#      - echo "Install Maven"
+#      - yum install -y maven
+#      - mvn --version
+#
+#  pre_build:
+#    commands:
+#      - echo "Install Docker"
+#      - apt-get update
+#      - apt-get install -y docker.io
+#      - systemctl docker start
+#      - docker --version
 
   pre_build:
     commands:
-      - echo "Install Maven"
-      - yum install -y maven
-      - mvn --version
-
+      - echo "Install Docker"
+      - yum install -y docker
+      - service docker start
   build:
     commands:
       - echo "Compile and run tests"
       - mvn clean test
-
-env:
-  variables:
-    DB_URL: "stock-feed-db.c2zo4gtpu4id.us-east-1.rds.amazonaws.com:5432/stock_feed_db"
-    DB_USERNAME: "postgres"
-    DB_PASSWORD: "postgres"
