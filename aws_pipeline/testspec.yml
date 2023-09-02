@@ -15,3 +15,9 @@ phases:
     commands:
       - echo "Compile and run tests"
       - mvn clean test
+
+env:
+  variables:
+    DB_URL: "stock-feed-db.c2zo4gtpu4id.us-east-1.rds.amazonaws.com:5432/stock_feed_db"
+    DB_USERNAME: "postgres"
+    DB_PASSWORD: "postgres"
