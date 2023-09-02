@@ -1,4 +1,4 @@
-version: 0.2
+version: 0.1
 
 phases:
 #  install:
@@ -17,11 +17,17 @@ phases:
 #      - systemctl docker start
 #      - docker --version
 
+  install:
+    commands:
+      - echo installing maven...
+      - yum install -y maven
+
   pre_build:
     commands:
       - echo "Install Docker"
-      - yum install -y docker
-      - service docker start
+#      - yum install -y docker
+      - docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
   build:
     commands:
       - echo "Compile and run tests"
