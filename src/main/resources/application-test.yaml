@@ -1,5 +1,8 @@
 quote-generation:
   enabled: false
 
+redis-cache:
+  enabled: false
+
 company:
   load: false

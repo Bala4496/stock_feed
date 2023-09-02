@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.User;
 import ua.bala.stocks_feed.model.UserRole;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(properties = {"spring.flyway.enabled=false"})
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 

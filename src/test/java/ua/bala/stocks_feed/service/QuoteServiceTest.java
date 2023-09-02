@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Mono;
 import ua.bala.stocks_feed.model.Quote;
 import ua.bala.stocks_feed.repository.QuoteRepository;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@TestPropertySource(properties = {"spring.flyway.enabled=false"})
 @ExtendWith(MockitoExtension.class)
 class QuoteServiceTest {
 

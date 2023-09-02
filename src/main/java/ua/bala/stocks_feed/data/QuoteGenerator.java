@@ -1,8 +1,7 @@
 package ua.bala.stocks_feed.data;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ua.bala.stocks_feed.model.Company;
@@ -15,16 +14,21 @@ import java.math.RoundingMode;
 import java.util.Random;
 
 @Service
-@Slf4j
-@ConditionalOnProperty(name = "quote-generation.enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class QuoteGenerator {
 
     private final QuoteService quoteService;
     private final CompanyService companyService;
 
+    @Value("${quote-generation.enabled}")
+    private boolean quoteGenerationEnabled;
+
     @Scheduled(fixedDelayString = "${quote-generation.delay}")
     public void generateStockQuotes() {
+        if (!quoteGenerationEnabled) {
+            return;
+        }
+
         companyService.getCompanies()
                 .map(Company::getCode)
                 .flatMap(quoteService::getQuoteByCode)
