@@ -32,5 +32,5 @@ phases:
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID
-#      - aws eks --region us-east-1 update-kubeconfig --name eks-stockfeed
-#      - kubectl apply -f manifest/stock-feed-manifest.yaml
+      - aws eks --region us-east-1 update-kubeconfig --name eks-stockfeed
+      - kubectl apply -f manifest/stock-feed-manifest.yaml

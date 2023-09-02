@@ -1,4 +1,9 @@
-version: 0.1
+version: 0.2
+
+env:
+  variables:
+    AWS_ACCOUNT_ID    : "554040323477"
+    AWS_DEFAULT_REGION: "us-east-1"
 
 phases:
 #  install:
@@ -8,25 +13,16 @@ phases:
 #      - echo "Install Maven"
 #      - yum install -y maven
 #      - mvn --version
-#
-#  pre_build:
-#    commands:
-#      - echo "Install Docker"
-#      - apt-get update
-#      - apt-get install -y docker.io
-#      - systemctl docker start
-#      - docker --version
 
   install:
     commands:
       - echo installing maven...
       - yum install -y maven
 
-  pre_build:
-    commands:
-      - echo "Install Docker"
-#      - yum install -y docker
-      - docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+#  pre_build:
+#    commands:
+#      - echo "Install Docker"
+#      - aws ecr get-login-password --region $AWS_DEFAULT_REGION| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
 
   build:
     commands:
