@@ -8,7 +8,7 @@ phases:
   pre_build:
     commands:
       - echo "Install Maven"
-      - apt-get install -y maven
+      - yum install -y maven
       - mvn --version
 
   build:
