@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stock-feed-namespace
+  namespace: stock-feed-namespace
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stock-feed-deployment
+  namespace: stock-feed-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stock-feed
+  template:
+    metadata:
+      labels:
+        app: stock-feed
+    spec:
+      initContainers:
+        - name: init-postgres-db
+          image: busybox:1.36
+          command: ['sh', '-c', 'echo -e "Checking for the availability of PostgresSQL Server deployment"; while ! nc -z postgres-db-host 5432; do sleep 1; printf "-"; done; echo -e "  >> PostgresSQL DB Server has started";']
+        - name: init-redis-cluster
+          image: busybox:1.36
+          command: ['sh', '-c', 'echo -e "Checking for the availability of Redis Cluster deployment"; while ! nc -z redis-cluster-host 6379; do sleep 1; printf "-"; done; echo -e "  >> Redis Cluster has started";']
+      containers:
+        - name: stock-feed-container
+          image: 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              value: "postgres-db-host"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: "stock_feed_db"
+            - name: DB_USERNAME
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-db-password
+                  key: db-password
+            - name: REDIS_HOST
+              value: "redis-cluster-host"
+            - name: GEN_ENABLE
+              value: "true"
+            - name: CACHEABLE
+              value: "true"
+#          livenessProbe:
+#            exec:
+#              command: ['/bin/sh', '-c', 'nc -z localhost 8080']
+#            initialDelaySeconds: 60
+#            periodSeconds: 10
+#          readinessProbe:
+#            httpGet:
+#              path: /health
+#              port: 8080
+#            initialDelaySeconds: 60
+#            periodSeconds: 10
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: stock-feed-loadbalancer
+  namespace: stock-feed-namespace
+spec:
+  type: LoadBalancer
+  selector:
+    app: stock-feed
+  ports:
+    - port: 80
+      targetPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-cluster-host
+  namespace: stock-feed-namespace
+spec:
+  type: ExternalName
+  externalName: stock-feed-redis.8c4mxt.ng.0001.euc1.cache.amazonaws.com
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-db-host
+  namespace: stock-feed-namespace
+spec:
+  type: ExternalName
+  externalName: stock-feed-db.cvtsh8fxolay.eu-central-1.rds.amazonaws.com
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-db-password
+  namespace: stock-feed-namespace
+type: Opaque
+data:
+  db-password: cG9zdGdyZXM= # password in base64

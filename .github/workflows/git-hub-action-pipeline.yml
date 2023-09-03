@@ -54,34 +54,29 @@ jobs:
           distribution: 'adopt'
 
       - name: Log in to AWS ECR
-        uses: aws-action/configre-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: 'us-east-1'
-#        run: |
-#          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          aws configure set default.region us-east-1
-#          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 554040323477.dkr.ecr.us-east-1.amazonaws.com
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region eu-central-1
+          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 554040323477.dkr.ecr.eu-central-1.amazonaws.com
 
       - name: Build Docker image for AWS ECR
-        run: docker build -t ecr-stock-feed:latest .
+        run: docker build -t stock-feed-ecr:latest .
 
       - name: Tag Docker image for AWS ECR
         run: |
           COMMIT_SHA=$(git rev-parse HEAD)
-          docker tag ecr-stock-feed:latest 554040323477.dkr.ecr.us-east-1.amazonaws.com/ecr-stock-feed:$COMMIT_SHA
-          docker tag ecr-stock-feed:latest 554040323477.dkr.ecr.us-east-1.amazonaws.com/ecr-stock-feed:latest
+          docker tag stock-feed-ecr:latest 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
+          docker tag stock-feed-ecr:latest 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:latest
 
       - name: Push Docker image to AWS ECR
         run: |
           COMMIT_SHA=$(git rev-parse HEAD)
-          docker push 554040323477.dkr.ecr.us-east-1.amazonaws.com/ecr-stock-feed:$COMMIT_SHA
-          docker push 554040323477.dkr.ecr.us-east-1.amazonaws.com/ecr-stock-feed:latest
-
-      - name: Update kube config
-        run: aws eks --region us-east-1 update-kubeconfig --name eks-stockfeed
+          docker push 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
+          docker push 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:latest
 
       - name: Deploy to EKS
-        run: kubectl apply -f manifest/stock-feed-manifest.yaml
+        run: |
+          aws eks --region eu-central-1 update-kubeconfig --name stock-feed
+#          kubectl apply -f k8s/manifest.yaml
+          kubectl set image deployment.apps/stock-feed-deployment stock-feed-container=554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
