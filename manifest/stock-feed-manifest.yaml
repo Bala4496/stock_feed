@@ -8,10 +8,10 @@ metadata:
 apiVersion: v1
 kind: Service
 metadata:
-  name: stock-feed-microservice
+  name: stock-feed-service
 spec:
   selector:
-    app: stock-feed-service
+    app: stock-feed-app
   ports:
     - protocol: TCP
       port: 8080
@@ -24,26 +24,32 @@ kind: Deployment
 metadata:
   name: stock-feed-deployment
   labels:
-    app: stock-feed-service
+    app: stock-feed-app
   namespace: stock-feed-namespace
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: stock-feed-service
+      app: stock-feed
   template:
     metadata:
       labels:
-        app: stock-feed-service
+        app: stock-feed
     spec:
       containers:
-        - name: ecr-stock-feed
+        - name: stock-feed-api
           image: 554040323477.dkr.ecr.us-east-1.amazonaws.com/ecr-stock-feed:latest
           ports:
             - containerPort: 8080
           env:
-            - name: DB_URL
-              value: "stock-feed-db.c2zo4gtpu4id.us-east-1.rds.amazonaws.com:5432/stock_feed_db"
+            - name: DB_HOST
+              value: "stock-feed-db.c2zo4gtpu4id.us-east-1.rds.amazonaws.com"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_DATABASE
+              value: "stock_feed_db"
+            - name: REDIS_HOST
+              value: "stock-feed-redis.sqxw2k.clustercfg.use1.cache.amazonaws.com:6379"
             - name: DB_USERNAME
               value: "postgres"
             - name: DB_PASSWORD
@@ -52,8 +58,6 @@ spec:
               value: "true"
             - name: CACHEABLE
               value: "true"
-            - name: REDIS_HOST
-              value: "stock-feed-redis.sqxw2k.clustercfg.use1.cache.amazonaws.com:6379"
           livenessProbe:
             exec:
               command:
@@ -64,7 +68,7 @@ spec:
             periodSeconds: 10
           readinessProbe:
             httpGet:
-              path: /stock-feed-service/health-status
+              path: /stock-feed-app/health-status
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
@@ -76,12 +80,12 @@ spec:
 #metadata:
 #  name: stock-feed-service-nodeport
 #  labels:
-#    app: stock-feed-service
+#    app: stock-feed-app
 #  namespace: stock-feed-namespace
 #spec:
 #  type: NodePort
 #  selector:
-#    app: stock-feed-service
+#    app: stock-feed-app
 #  ports:
 #    - port: 8080
 #      targetPort: 8080
@@ -95,4 +99,4 @@ spec:
 #  name: postgres
 #spec:
 #  type: ExternalName
-#  externalName: postgresdb.c2zo4gtpu4id.us-east-1.rds.amazonaws.com
+#  externalName: stock-feed-db.c2zo4gtpu4id.us-east-1.rds.amazonaws.com
