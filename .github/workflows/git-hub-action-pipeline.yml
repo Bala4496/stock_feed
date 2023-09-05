@@ -78,5 +78,4 @@ jobs:
       - name: Deploy to EKS
         run: |
           aws eks --region eu-central-1 update-kubeconfig --name stock-feed
-#          kubectl apply -f k8s/manifest.yaml
-          kubectl set image deployment.apps/stock-feed-deployment stock-feed-container=554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
+          kubectl set image deployment.apps/stock-feed-deployment stock-feed-container=554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA -n stock-feed-namespace
