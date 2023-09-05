@@ -1,5 +1,12 @@
 name: Java Spring Boot CI/CD
 
+env:
+  COMMIT_SHA: ${{ github.sha }}
+  AWS_REGION: eu-central-1
+  AWS_ECR: 554040323477.dkr.ecr.eu-central-1.amazonaws.com
+  AWS_ECR_REPO: stock-feed-ecr
+  AWS_EKS_CLUSTER: stock-feed
+
 on:
   push:
     branches:
@@ -57,25 +64,23 @@ jobs:
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region eu-central-1
-          aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 554040323477.dkr.ecr.eu-central-1.amazonaws.com
+          aws configure set default.region ${{ env.AWS_REGION }}
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.AWS_ECR }}
 
       - name: Build Docker image for AWS ECR
         run: docker build -t stock-feed-ecr:latest .
 
       - name: Tag Docker image for AWS ECR
         run: |
-          COMMIT_SHA=$(git rev-parse HEAD)
-          docker tag stock-feed-ecr:latest 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
-          docker tag stock-feed-ecr:latest 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:latest
+          docker tag stock-feed-ecr:latest ${{ env.AWS_ECR }}/${{ env.AWS_ECR_REPO }}:${{ env.COMMIT_SHA }}
+          docker tag stock-feed-ecr:latest ${{ env.AWS_ECR }}/${{ env.AWS_ECR_REPO }}:latest
 
       - name: Push Docker image to AWS ECR
         run: |
-          COMMIT_SHA=$(git rev-parse HEAD)
-          docker push 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA
-          docker push 554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:latest
+          docker push ${{ env.AWS_ECR }}/${{ env.AWS_ECR_REPO }}:${{ env.COMMIT_SHA }}
+          docker push ${{ env.AWS_ECR }}/${{ env.AWS_ECR_REPO }}:latest
 
       - name: Deploy to EKS
         run: |
-          aws eks --region eu-central-1 update-kubeconfig --name stock-feed
-          kubectl set image deployment.apps/stock-feed-deployment stock-feed-container=554040323477.dkr.ecr.eu-central-1.amazonaws.com/stock-feed-ecr:$COMMIT_SHA -n stock-feed-namespace
+          aws eks --region ${{ env.AWS_REGION }} update-kubeconfig --name ${{ env.AWS_EKS_CLUSTER }}
+          kubectl set image deployment/stock-feed-deployment stock-feed-container=${{ env.AWS_ECR }}/${{ env.AWS_ECR_REPO }}:${{ env.COMMIT_SHA }} -n stock-feed-namespace
