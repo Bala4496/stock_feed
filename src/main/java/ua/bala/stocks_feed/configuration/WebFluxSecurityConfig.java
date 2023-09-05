@@ -29,6 +29,7 @@ public class WebFluxSecurityConfig {
                 .httpBasic(Customizer.withDefaults())
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .authorizeExchange(spec -> spec
+                        .pathMatchers(HttpMethod.GET, "/liveness", "/readiness").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/register").permitAll()
                         .pathMatchers("/api/v1/api-key/**").authenticated()
                         .anyExchange().access(apiKeyAuthorizationManager)

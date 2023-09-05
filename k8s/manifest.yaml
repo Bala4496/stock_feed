@@ -53,17 +53,18 @@ spec:
               value: "true"
             - name: CACHEABLE
               value: "true"
-#          livenessProbe:
-#            exec:
-#              command: ['/bin/sh', '-c', 'nc -z localhost 8080']
-#            initialDelaySeconds: 60
-#            periodSeconds: 10
-#          readinessProbe:
-#            httpGet:
-#              path: /health
-#              port: 8080
-#            initialDelaySeconds: 60
-#            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /liveness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /readiness
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
 
 ---
 
