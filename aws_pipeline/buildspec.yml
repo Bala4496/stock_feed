@@ -2,29 +2,28 @@ version: 0.2
 
 env:
   variables:
-    AWS_ACCOUNT_ID    : "554040323477"
-    AWS_DEFAULT_REGION: "us-east-1"
-    ECR_REPO_NAME     : "ecr-stock-feed"
-    ECR_IMAGE_TAG     : "latest"
+    AWS_DEFAULT_REGION  : "eu-central-1"
+    AWS_ACCOUNT_ID      : "554040323477"
+    ECR_REPO_NAME       : "stock-feed-ecr"
+    ECR_IMAGE_TAG       : "latest"
 
 phases:
   install:
     commands:
-      - echo "Check aws and git version"
+      - echo Check aws and git version
       - aws --version
       - git --version
 
   pre_build:
     commands:
-      - echo "Login to AWS ECR and get commit id"
+      - echo Login in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - COMMIT_ID=$(git rev-parse --short HEAD)
-      - mvn test
 
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t $ECR_REPO_NAME:$ECR_IMAGE_TAG . || exit 1
+      - docker build -t $ECR_REPO_NAME .
       - docker tag $ECR_REPO_NAME:$ECR_IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
       - docker tag $ECR_REPO_NAME:$ECR_IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID
 
@@ -33,3 +32,8 @@ phases:
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID
+#      - echo "Update Kube Config"
+#      - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name stock-feed
+#      - echo "Apply changes to kube manifests"
+#      - kubectl apply -f k8s/manifest.yml
+#      - echo "Completed applying changes to Kubernetes Objects"
