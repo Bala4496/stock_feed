@@ -7,10 +7,10 @@ env:
   AWS_ECR_REPO: stock-feed-ecr
   AWS_EKS_CLUSTER: stock-feed
 
-on:
-  push:
-    branches:
-      - master
+#on:
+#  push:
+#    branches:
+#      - master
 
 jobs:
   build:
