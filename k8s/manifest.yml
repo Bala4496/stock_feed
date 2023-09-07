@@ -1,8 +1,8 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: stock-feed-namespace
-  namespace: stock-feed-namespace
+#apiVersion: v1
+#kind: Namespace
+#metadata:
+#  name: stock-feed-namespace
+#  namespace: stock-feed-namespace
 
 ---
 
@@ -10,7 +10,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: stock-feed-deployment
-  namespace: stock-feed-namespace
+#  namespace: stock-feed-namespace
 spec:
   replicas: 2
   selector:
@@ -72,7 +72,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: stock-feed-loadbalancer
-  namespace: stock-feed-namespace
+#  namespace: stock-feed-namespace
 spec:
   type: LoadBalancer
   selector:
@@ -87,7 +87,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-cluster-host
-  namespace: stock-feed-namespace
+#  namespace: stock-feed-namespace
 spec:
   type: ExternalName
   externalName: stock-feed-redis.8c4mxt.ng.0001.euc1.cache.amazonaws.com
@@ -98,7 +98,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-db-host
-  namespace: stock-feed-namespace
+#  namespace: stock-feed-namespace
 spec:
   type: ExternalName
   externalName: stock-feed-db.cvtsh8fxolay.eu-central-1.rds.amazonaws.com
@@ -109,7 +109,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-db-password
-  namespace: stock-feed-namespace
+#  namespace: stock-feed-namespace
 type: Opaque
 data:
   db-password: cG9zdGdyZXM= # password in base64
