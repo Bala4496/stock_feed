@@ -32,8 +32,9 @@ phases:
       - echo Pushing the Docker image...
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$ECR_IMAGE_TAG
       - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID
-#      - echo "Update Kube Config"
-#      - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name stock-feed
-#      - echo "Apply changes to kube manifests"
-#      - kubectl apply -f k8s/manifest.yml
-#      - echo "Completed applying changes to Kubernetes Objects"
+      - echo Update Kube Config
+      - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name stock-feed
+      - echo Apply changes to kube manifests
+      - kubectl apply -f k8s/manifest.yml
+      - kubectl rollout restart -f k8s/manifest.yaml
+      - echo Completed applying changes to Kubernetes
