@@ -42,5 +42,6 @@ phases:
       - echo Update Kube Config
       - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name stock-feed
       - echo Apply changes to kube manifests
+      - kubectl apply -f k8s/manifest.yml
       - kubectl set image deployment/stock-feed-deployment stock-feed-container=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME:$COMMIT_ID -n stock-feed-namespace
       - echo Completed applying changes to Kubernetes
