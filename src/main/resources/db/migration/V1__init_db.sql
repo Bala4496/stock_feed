@@ -23,7 +23,7 @@ create table api_keys
 create table companies
 (
     id   serial primary key,
-    code char(4)     not null unique,
+    code varchar(4)     not null unique,
     name varchar(64) not null unique
 );
 

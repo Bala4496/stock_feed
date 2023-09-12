@@ -4,12 +4,12 @@ spring:
     name: stocksfeed
 
   r2dbc:
-    url: r2dbc:pool:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:stock_feed_db}
+    url: r2dbc:pool:postgresql://${DB_HOST:localhost:5432}/${DB_DATABASE:stock_feed_db}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
 
   flyway:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_DATABASE:stock_feed_db}
+    url: jdbc:postgresql://${DB_HOST:localhost:5432}/${DB_DATABASE:stock_feed_db}
     user: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
 
@@ -24,7 +24,7 @@ management:
           additional-path: server:/readiness
 
 rate-limiter:
-  rate: 3
+  rate: 100
   timeline: 5000 # 5 * 1000ms
 
 quote-generation:
