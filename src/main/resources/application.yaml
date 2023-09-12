@@ -26,7 +26,6 @@ management:
 rate-limiter:
   rate: 3
   timeline: 5000 # 5 * 1000ms
-  timeout: 100
 
 quote-generation:
   enabled: ${GEN_ENABLE:true}
