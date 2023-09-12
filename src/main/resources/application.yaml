@@ -29,7 +29,7 @@ rate-limiter:
 
 quote-generation:
   enabled: ${GEN_ENABLE:true}
-  delay: ${GEN_DELAY:30000} # 30 * 1000ms = 1 min
+  delay: ${GEN_DELAY:30000} # 30 * 1000ms
 
 redis-cache:
   enabled: ${CACHEABLE:true}
