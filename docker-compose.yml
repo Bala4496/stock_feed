@@ -16,6 +16,9 @@ services:
       CACHEABLE: true
     ports:
       - "8080:8080"
+    networks:
+      - stock-feed-app
+      - stock-feed-network
 
   postgres:
     image: postgres:latest
@@ -28,6 +31,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - stock-feed-app
 
   redis:
     image: redis:latest
@@ -36,7 +41,14 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    networks:
+      - stock-feed-app
 
 volumes:
   redis_data:
   postgres_data:
+
+networks:
+  stock-feed-app:
+  stock-feed-network:
+    external: true
